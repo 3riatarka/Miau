@@ -1,0 +1,51 @@
+#!/bin/bash
+# Script to interface with miau from i3blocks. Add this file to the rest of i3blocks scripts (/usr/share/i3blocks)
+# Add this to i3blocks.conf:
+#     [elgato]
+#     interval=persist
+#
+
+
+$miau_path = ""
+
+hue=$(python3 $miau_path --show | grep Hue | awk -F": " '{print $2}' | xargs)
+bri=$(python3 $miau_path --show | grep Brightness | awk -F": " '{print $2}' | xargs | cut -d"%" -f1)
+stat=$(python3 $miau_path --show | grep Status | awk -F": " '{print $2}' | xargs)
+
+case $BLOCK_BUTTON in
+	1) python3 $miau_path --switch ;; # Left click to switch on and off
+	8) 
+		let "hue=hue-10"
+		if [[ "$hue" -lt 0 ]]; then 
+			$hue=-1 
+		fi 
+		python3 $miau_path -c $hue
+		;; # Thumb button down to reduce the hue
+	9) 
+		let "hue=hue+10" 
+		if [[ "$hue" -gt 350 ]]; then
+			$hue=350
+		fi
+		python3 $miau_path -c $hue
+		;; # Thumb button raise to up the hue
+	4)
+		let "bri=bri+10"
+		if [[ "$bri" -gt 100 ]]; then
+			$bri=100
+		fi
+		python3 $miau_path -b $bri
+		;; # Wheel up to add brightness
+	5)
+		let "bri=bri-10"
+		if [[ "$bri2" -le 0 ]];then
+			$bri=-1
+		fi
+		python3 $miau_path -b $bri
+		;; # Wheel down to reduce brightness
+esac
+
+# Font awesome: https://fontawesome.com/icons/paw?s=solid
+
+echo "M-oM-^FM-0"
+echo "M-oM-^FM-0"
+echo ""
